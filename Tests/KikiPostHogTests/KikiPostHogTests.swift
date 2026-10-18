@@ -45,6 +45,12 @@ final class KikiPostHogTests: XCTestCase {
         XCTAssertEqual(starts, 1)
     }
 
+    func testBlankHostFallsBackToDefault() {
+        XCTAssertEqual(KikiPostHogConfiguration(token: "phc_x", host: "").host, KikiPostHogConfiguration.defaultHost)
+        XCTAssertEqual(KikiPostHogConfiguration(token: "phc_x", host: "  ").host, KikiPostHogConfiguration.defaultHost)
+        XCTAssertEqual(KikiPostHogConfiguration(token: "phc_x", host: "https://eu.i.posthog.com").host, "https://eu.i.posthog.com")
+    }
+
     func testConfigurationFromInfoPlistAndMissingToken() async throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".bundle")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)

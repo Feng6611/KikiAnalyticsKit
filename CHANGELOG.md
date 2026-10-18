@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- `KikiPostHogConfiguration` treats a blank host (an empty build setting) as the default host.
+
 ## 0.1.0 - 2026-10-18
 
 ### Added
