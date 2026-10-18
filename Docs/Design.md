@@ -282,6 +282,31 @@ PostHog，不需要自建 webhook。
   这部分不开，paywall 事件由 App 自己发。
 - **收入的事实源**：只看这些服务端事件，客户端的 `purchase result` 只用来看漏斗。
 
+## 5B. PostHog 项目结构（建议，待确认）
+
+PostHog 的层级是 组织 → 项目；项目之间不能联合查询，项目内用事件属性筛选。
+
+| 层级 | 建议 | 理由 |
+| --- | --- | --- |
+| 组织 | 一个：kkuk | 计费和成员统一 |
+| 项目 `Mac Apps` | 所有 Mac App 共用一个；能沿用旧的 `mac-app` 项目就沿用 | 跨 App 看板只能在同一个项目里做；一个 token、一个 RevenueCat 集成目标 |
+| 项目 `Mac Apps Dev` | Debug 联调和 RevenueCat sandbox 事件 | 测试数据不进正式口径 |
+| 项目 `Sites`（已有） | 官网，不动 | 身份模型不同（访客 vs 安装），经 App Store 也连不上，混在一起只会搞混口径 |
+| 项目内分 App | 每个事件的 `app_id`，再按 `distribution_channel` 细分 | 不用付费的 Group Analytics；看板一个总览 + 每个 App 一个 |
+
+注意：
+- 启用 RevenueCat 集成后先核对它发来的事件里有没有自带 `app_id`（RevenueCat 自己的 app ID）。
+  如果和 Kit 的 `app_id` 冲突，看板里 RevenueCat 事件按 `product_id` 或人物关联筛选，不要改 Kit 的键名。
+- 如果套餐限制项目数量，`Mac Apps Dev` 可以不建：Debug 构建本来就不带 token，什么都不发。
+
+## 接入状态（2026-10-18）
+
+- PostHog project token：**未填**。各 App 的 `LocalSecrets.xcconfig` 里 `KikiPostHogProjectToken` 留空，由负责人填写；
+  没有 token 时 Kit 不初始化 SDK、零请求。
+- PostHog 项目：结构见 5B，尚未确认和创建。
+- RevenueCat PostHog 集成：未启用，等 project key。KikiCommerceKit 的 `postHogUserID` 已在 main（`00f31b1`），未发版。
+- App 接入：Command Reopen 已决定重新加回（其仓库 `docs/DecisionLog.md` D-012）；ArtWall 待接入。两个 App 的事件表都待定。
+
 ## 6. 推荐的共享事件名
 
 Kit 不强制，但建议各 App 的事件表优先复用以下名字，跨 App 看板才能对齐。
